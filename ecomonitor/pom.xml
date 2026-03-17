@@ -56,7 +56,6 @@
 
         <dependency>
             <groupId>org.jfree</groupId>
-            <groupId>jfreechart</groupId>
             <artifactId>jfreechart</artifactId>
             <version>1.5.4</version>
         </dependency>
