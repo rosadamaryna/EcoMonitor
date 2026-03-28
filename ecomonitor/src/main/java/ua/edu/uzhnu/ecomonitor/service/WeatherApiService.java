@@ -1,6 +1,7 @@
 package ua.edu.uzhnu.ecomonitor.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ua.edu.uzhnu.ecomonitor.model.Measurement;
@@ -29,6 +30,8 @@ public class WeatherApiService {
         this.restTemplate = new RestTemplate();
     }
 
+    // Автоматичний запуск кожну годину (хвилина 0, секунда 0)
+    @Scheduled(cron = "0 0 * * * *")
     public Measurement fetchAndSaveData() {
         String airUrl = String.format(
                 "http://api.openweathermap.org/data/2.5/air_pollution?lat=%s&lon=%s&appid=%s",
@@ -45,28 +48,27 @@ public class WeatherApiService {
             Map<String, Object> weatherResponse = restTemplate.getForObject(weatherUrl, Map.class);
 
             if (airResponse != null && weatherResponse != null) {
+                Measurement measurement = new Measurement();
+
                 // Парсинг екології
                 List<Map<String, Object>> list = (List<Map<String, Object>>) airResponse.get("list");
                 Map<String, Object> components = (Map<String, Object>) list.get(0).get("components");
 
-                Double pm25 = ((Number) components.get("pm2_5")).doubleValue();
-                Double pm10 = ((Number) components.get("pm10")).doubleValue();
-                Double no2 = ((Number) components.get("no2")).doubleValue();
+                measurement.setPm25(((Number) components.get("pm2_5")).doubleValue());
+                measurement.setPm10(((Number) components.get("pm10")).doubleValue());
+                measurement.setNo2(((Number) components.get("no2")).doubleValue());
 
                 // Парсинг погоди
                 Map<String, Object> main = (Map<String, Object>) weatherResponse.get("main");
-                Double temperature = ((Number) main.get("temp")).doubleValue();
-                Double humidity = ((Number) main.get("humidity")).doubleValue();
+                measurement.setTemperature(((Number) main.get("temp")).doubleValue());
+                measurement.setHumidity(((Number) main.get("humidity")).doubleValue());
 
-                System.out.println(String.format(
-                        "API Data Fetched successfully! PM2.5: %.2f, Temp: %.2f°C", pm25, temperature
-                ));
+                System.out.println("Scheduler: Data fetched and successfully saved into database.");
+                return repository.save(measurement);
             }
         } catch (Exception e) {
-            System.err.println("Помилка при отриманні даних з API: " + e.getMessage());
+            System.err.println("Помилка автоматичного збору даних: " + e.getMessage());
         }
-
-        // Поки що повертаємо null
         return null;
     }
 }
