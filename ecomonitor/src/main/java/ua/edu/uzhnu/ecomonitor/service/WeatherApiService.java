@@ -7,6 +7,7 @@ import org.springframework.web.client.RestTemplate;
 import ua.edu.uzhnu.ecomonitor.model.Measurement;
 import ua.edu.uzhnu.ecomonitor.repository.MeasurementRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,6 @@ public class WeatherApiService {
         this.restTemplate = new RestTemplate();
     }
 
-    // Рефакторинг: Оптимізовано планувальник для щогодинного фонового збору (Cron: 0 0 * * * *)
     @Scheduled(cron = "0 0 * * * *")
     public Measurement fetchAndSaveData() {
         System.out.println("Scheduler execution started: Fetching fresh environmental metrics...");
@@ -65,7 +65,10 @@ public class WeatherApiService {
                 measurement.setTemperature(((Number) main.get("temp")).doubleValue());
                 measurement.setHumidity(((Number) main.get("humidity")).doubleValue());
 
-                System.out.println("Scheduler transaction pipeline completed successfully.");
+                // ФІКС БАГУ: Тепер фіксуємо точний час транзакції в базі даних!
+                measurement.setTimestamp(LocalDateTime.now());
+
+                System.out.println("Scheduler transaction pipeline completed successfully. Timestamp applied.");
                 return repository.save(measurement);
             }
         } catch (Exception e) {
