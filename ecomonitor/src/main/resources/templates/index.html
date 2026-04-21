@@ -47,47 +47,53 @@
 <div class="container" th:if="${latest != null}">
     <div class="row g-4">
         <div class="col-md-4">
-            <div class="indicator-card" style="background: linear-gradient(135deg, #10b981 0%, #1e293b 150%);">
+            <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getPm25Color()} + ' 0%, #1e293b 150%);'">
                 <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalPM25">?</button>
                 <small class="text-uppercase fw-bold opacity-75">Пил PM2.5</small>
                 <div class="card-value">
                     <span th:text="${latest.pm25 != null ? latest.pm25 : '0.0'}">0.0</span>
                     <small style="font-size: 1rem;"> мкг</small>
                 </div>
-                <div class="status-badge" th:text="${latest.getAqiStatus()}">Статус</div>
+                <div class="status-badge" th:text="${latest.getPm25Status()}">Статус</div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="indicator-card" style="background: linear-gradient(135deg, #64748b 0%, #1e293b 150%);">
-                <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalPM10">?</button>
-                <small class="text-uppercase fw-bold opacity-75">Пил PM10</small>
-                <div class="card-value">
-                    <span th:text="${latest.pm10 != null ? latest.pm10 : '0.0'}">0.0</span>
-                    <small style="font-size: 1rem;"> мкг</small>
+            <div class="card-wrapper" th:with="pm10Status=${latest.pm10 <= 50 ? 'Норма' : (latest.pm10 <= 100 ? 'Підвищено' : 'Небезпечно')}">
+                <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getPm10Color()} + ' 0%, #1e293b 150%);'">
+                    <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalPM10">?</button>
+                    <small class="text-uppercase fw-bold opacity-75">Пил PM10</small>
+                    <div class="card-value">
+                        <span th:text="${latest.pm10 != null ? latest.pm10 : '0.0'}">0.0</span>
+                        <small style="font-size: 1rem;"> мкг</small>
+                    </div>
+                    <div class="status-badge" th:text="${pm10Status}">Статус</div>
                 </div>
-                <div class="status-badge">Моніторинг...</div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="indicator-card" style="background: linear-gradient(135deg, #f59e0b 0%, #1e293b 150%);">
-                <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalNO2">?</button>
-                <small class="text-uppercase fw-bold opacity-75">Азот NO₂</small>
-                <div class="card-value">
-                    <span th:text="${latest.no2 != null ? latest.no2 : '0.0'}">0.0</span>
-                    <small style="font-size: 1rem;"> мкг</small>
+            <div class="card-wrapper" th:with="no2Status=${latest.no2 <= 40 ? 'Чисто' : (latest.no2 <= 80 ? 'Помірно' : 'Забруднено')}">
+                <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getNo2Color()} + ' 0%, #1e293b 150%);'">
+                    <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalNO2">?</button>
+                    <small class="text-uppercase fw-bold opacity-75">Азот NO₂</small>
+                    <div class="card-value">
+                        <span th:text="${latest.no2 != null ? latest.no2 : '0.0'}">0.0</span>
+                        <small style="font-size: 1rem;"> мкг</small>
+                    </div>
+                    <div class="status-badge" th:text="${no2Status}">Статус</div>
                 </div>
-                <div class="status-badge">Моніторинг...</div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="indicator-card" style="background: linear-gradient(135deg, #ef4444 0%, #1e293b 150%);">
-                <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalTemp">?</button>
-                <small class="text-uppercase fw-bold opacity-75">Температура</small>
-                <div class="card-value"><span th:text="${latest.temperature != null ? latest.temperature : '0.0'}">0.0</span>°C</div>
-                <div class="status-badge">Погода</div>
+            <div class="card-wrapper" th:with="tempStatus=${latest.temperature > 25 ? 'Спекотно' : (latest.temperature > 15 ? 'Комфортно' : 'Прохолодно')}">
+                <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getTempColor()} + ' 0%, #1e293b 150%);'">
+                    <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalTemp">?</button>
+                    <small class="text-uppercase fw-bold opacity-75">Температура</small>
+                    <div class="card-value"><span th:text="${latest.temperature != null ? latest.temperature : '0.0'}">0.0</span>°C</div>
+                    <div class="status-badge" th:text="${tempStatus}">Статус</div>
+                </div>
             </div>
         </div>
 
@@ -96,7 +102,7 @@
                 <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalHum">?</button>
                 <small class="text-uppercase fw-bold opacity-75">Вологість</small>
                 <div class="card-value"><span th:text="${latest.humidity != null ? latest.humidity : '0.0'}">0.0</span>%</div>
-                <div class="status-badge">Атмосфера</div>
+                <div class="status-badge" th:text="${latest.humidity > 60 ? 'Волого' : (latest.humidity < 30 ? 'Сухо' : 'Оптимально')}">Статус</div>
             </div>
         </div>
     </div>

@@ -49,7 +49,7 @@ public class Measurement {
      * Визначення індексу якості повітря (AQI) на основі концентрації часток PM2.5.
      * Повертає текстовий статус для відображення на сторінці моніторингу.
      */
-    public String getAqiStatus() {
+    public String getPm25Status() {
         if (pm25 == null) return "Немає даних";
         if (pm25 <= 12.0) return "Відмінно";
         if (pm25 <= 35.4) return "Задовільно";
@@ -71,5 +71,48 @@ public class Measurement {
         if (pm25 > 12.0 || pm10 > 50 || no2 > 40) return "Задовільно";
 
         return "Відмінно";
+    }
+
+    // --- Методи динамічного підбору кольорів для веб-інтерфейсу (HEX-коди) ---
+
+    /**
+     * Повертає колір для картки PM2.5 залежно від рівня забруднення.
+     */
+    public String getPm25Color() {
+        if (pm25 == null) return "#64748b"; // Сірий за замовчуванням
+        if (pm25 <= 12.0) return "#10b981"; // Зелений (Відмінно)
+        if (pm25 <= 35.4) return "#f59e0b"; // Жовтий (Задовільно)
+        if (pm25 <= 55.4) return "#f97316"; // Помаранчевий (Шкідливо)
+        return "#ef4444"; // Червоний (Небезпечно)
+    }
+
+    /**
+     * Повертає колір для картки PM10.
+     */
+    public String getPm10Color() {
+        if (pm10 == null) return "#64748b";
+        if (pm10 <= 50.0) return "#10b981"; // Норма
+        if (pm10 <= 100.0) return "#f59e0b"; // Підвищено
+        return "#ef4444"; // Небезпечно
+    }
+
+    /**
+     * Повертає колір для картки діоксиду азоту NO2.
+     */
+    public String getNo2Color() {
+        if (no2 == null) return "#64748b";
+        if (no2 <= 40.0) return "#10b981"; // Чисто
+        if (no2 <= 80.0) return "#f59e0b"; // Помірне забруднення
+        return "#ef4444"; // Високе забруднення
+    }
+
+    /**
+     * Повертає колір для температурного віджета залежно від градусів.
+     */
+    public String getTempColor() {
+        if (temperature == null) return "#64748b";
+        if (temperature > 25.0) return "#ef4444"; // Спекотно (Червоний)
+        if (temperature > 15.0) return "#10b981"; // Комфортно (Зелений)
+        return "#3b82f6"; // Прохолодно/Холодно (Синій)
     }
 }
