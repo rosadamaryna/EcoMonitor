@@ -33,6 +33,8 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .chart-card { background: white; border-radius: var(--card-radius); padding: 2rem; }
+        .nav-pills .nav-link { color: #64748b; font-weight: 600; cursor: pointer; border-radius: 10px; }
+        .nav-pills .nav-link.active { background-color: #10b981 !important; color: white; }
     </style>
 </head>
 <body>
@@ -40,7 +42,7 @@
 <nav class="navbar navbar-light bg-white shadow-sm mb-4">
     <div class="container">
         <a class="navbar-brand fw-bold text-success" href="/">🌿 EcoMonitor UzhNU</a>
-        <span class="small text-muted">Дані: OpenWeather API (Чернетка інтерфейсу)</span>
+        <span class="small text-muted">Дані: OpenWeather API</span>
     </div>
 </nav>
 
@@ -107,7 +109,7 @@
         </div>
     </div>
 
-    <div class="overall-status-box d-flex align-items-center">
+    <div class="overall-status-box d-flex align-items-center" th:style="'border-left-color:' + ${latest.getPm25Color()}">
         <div class="me-4" style="font-size: 2.5rem;">🍃</div>
         <div>
             <h5 class="fw-bold mb-1">Загальний стан повітря: <span th:text="${latest.getOverallStatus()}">Аналіз...</span></h5>
@@ -115,9 +117,21 @@
         </div>
     </div>
 
-    <div class="chart-card shadow-sm mt-4 text-center py-5 bg-white">
-        <h4 class="text-muted mb-2">Гістограми та аналітичні графіки</h4>
-        <p class="text-muted small mb-0">Компоненти візуалізації JFreeChart та таблиця історії вимірювань будуть підключені у наступних комітах.</p>
+    <div class="chart-card shadow-sm mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+            <h3 class="h6 fw-bold text-uppercase text-muted mb-0">📈 Динаміка показника: <span id="activeParamName">PM2.5</span></h3>
+            <ul class="nav nav-pills small" id="chartPills">
+                <li class="nav-item"><a class="nav-link active">PM2.5</a></li>
+                <li class="nav-item"><a class="nav-link">PM10</a></li>
+                <li class="nav-item"><a class="nav-link">NO₂</a></li>
+                <li class="nav-item"><a class="nav-link">Темп.</a></li>
+                <li class="nav-item"><a class="nav-link">Вологість</a></li>
+            </ul>
+        </div>
+
+        <div class="text-center p-3 border rounded-4 bg-light">
+            <img id="chartImage" src="chart.png" class="img-fluid" alt="Графік екологічної динаміки">
+        </div>
     </div>
 </div>
 
