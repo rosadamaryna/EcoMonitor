@@ -42,7 +42,10 @@
 <nav class="navbar navbar-light bg-white shadow-sm mb-4">
     <div class="container">
         <a class="navbar-brand fw-bold text-success" href="/">🌿 EcoMonitor UzhNU</a>
-        <span class="small text-muted">Дані: OpenWeather API</span>
+        <div>
+            <a class="btn btn-sm btn-outline-secondary me-2" href="/history">🕒 Архів історії</a>
+            <span class="small text-muted">Дані: OpenWeather API</span>
+        </div>
     </div>
 </nav>
 
@@ -121,16 +124,16 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <h3 class="h6 fw-bold text-uppercase text-muted mb-0">📈 Динаміка показника: <span id="activeParamName">PM2.5</span></h3>
             <ul class="nav nav-pills small" id="chartPills">
-                <li class="nav-item"><a class="nav-link active">PM2.5</a></li>
-                <li class="nav-item"><a class="nav-link">PM10</a></li>
-                <li class="nav-item"><a class="nav-link">NO₂</a></li>
-                <li class="nav-item"><a class="nav-link">Темп.</a></li>
-                <li class="nav-item"><a class="nav-link">Вологість</a></li>
+                <li class="nav-item"><a class="nav-link active" onclick="switchChart('pm25', 'PM2.5')">PM2.5</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="switchChart('pm10', 'PM10')">PM10</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="switchChart('no2', 'NO₂')">NO₂</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="switchChart('temp', 'Температура')">Темп.</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="switchChart('hum', 'Вологість')">Вологість</a></li>
             </ul>
         </div>
 
         <div class="text-center p-3 border rounded-4 bg-light">
-            <img id="chartImage" src="chart.png" class="img-fluid" alt="Графік екологічної динаміки">
+            <img id="chartImage" th:src="@{/chart/pm25}" class="img-fluid" alt="Графік екологічної динаміки">
         </div>
     </div>
 </div>
@@ -194,6 +197,25 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    function switchChart(paramType, paramLabel) {
+        // Оновлюємо текстовий заголовок
+        document.getElementById('activeParamName').innerText = paramLabel;
+
+        // Змінюємо шлях картинки на новий ендпоінт контролера
+        document.getElementById('chartImage').src = '/chart/' + paramType;
+
+        // Перемикаємо візуально активну вкладку (клас active)
+        const links = document.querySelectorAll('#chartPills .nav-link');
+        links.forEach(link => {
+            link.classList.remove('active');
+            if (link.innerText === paramLabel || (paramLabel === 'Температура' && link.innerText === 'Темп.')) {
+                link.classList.add('active');
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
