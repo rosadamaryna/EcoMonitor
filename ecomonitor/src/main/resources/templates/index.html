@@ -35,6 +35,13 @@
         .chart-card { background: white; border-radius: var(--card-radius); padding: 2rem; }
         .nav-pills .nav-link { color: #64748b; font-weight: 600; cursor: pointer; border-radius: 10px; }
         .nav-pills .nav-link.active { background-color: #10b981 !important; color: white; }
+        .history-container { max-width: 1100px; margin: 0 auto; }
+        .history-item {
+            display: grid; grid-template-columns: 0.8fr 1fr 1fr 1fr 0.8fr 0.8fr 1.5fr;
+            align-items: center; gap: 10px; background: white;
+            border-radius: 12px; padding: 12px 20px; margin-bottom: 8px; border: 1px solid #edf2f7;
+        }
+        .status-pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; color: white; text-align: center; min-width: 90px; }
     </style>
 </head>
 <body>
@@ -42,63 +49,54 @@
 <nav class="navbar navbar-light bg-white shadow-sm mb-4">
     <div class="container">
         <a class="navbar-brand fw-bold text-success" href="/">🌿 EcoMonitor UzhNU</a>
-        <div>
-            <a class="btn btn-sm btn-outline-secondary me-2" href="/history">🕒 Архів історії</a>
-            <span class="small text-muted">Дані: OpenWeather API</span>
-        </div>
+        <span class="small text-muted">Дані: OpenWeather API</span>
     </div>
 </nav>
 
 <div class="container" th:if="${latest != null}">
     <div class="row g-4">
         <div class="col-md-4">
-            <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getPm25Color()} + ' 0%, #1e293b 150%);'">
+            <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getAqiColor()} + ' 0%, #1e293b 150%);'">
                 <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalPM25">?</button>
                 <small class="text-uppercase fw-bold opacity-75">Пил PM2.5</small>
                 <div class="card-value">
-                    <span th:text="${latest.pm25 != null ? latest.pm25 : '0.0'}">0.0</span>
+                    <span th:text="${#numbers.formatDecimal(latest.pm25, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>
                     <small style="font-size: 1rem;"> мкг</small>
                 </div>
-                <div class="status-badge" th:text="${latest.getPm25Status()}">Статус</div>
+                <div class="status-badge" th:text="${latest.getAqiStatus()}">Статус</div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card-wrapper" th:with="pm10Status=${latest.pm10 <= 50 ? 'Норма' : (latest.pm10 <= 100 ? 'Підвищено' : 'Небезпечно')}">
-                <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getPm10Color()} + ' 0%, #1e293b 150%);'">
-                    <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalPM10">?</button>
-                    <small class="text-uppercase fw-bold opacity-75">Пил PM10</small>
-                    <div class="card-value">
-                        <span th:text="${latest.pm10 != null ? latest.pm10 : '0.0'}">0.0</span>
-                        <small style="font-size: 1rem;"> мкг</small>
-                    </div>
-                    <div class="status-badge" th:text="${pm10Status}">Статус</div>
+            <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getPm10Color()} + ' 0%, #1e293b 150%);'">
+                <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalPM10">?</button>
+                <small class="text-uppercase fw-bold opacity-75">Пил PM10</small>
+                <div class="card-value">
+                    <span th:text="${#numbers.formatDecimal(latest.pm10, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>
+                    <small style="font-size: 1rem;"> мкг</small>
                 </div>
+                <div class="status-badge" th:text="${latest.pm10 <= 50 ? 'Норма' : 'Підвищено'}">Статус</div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card-wrapper" th:with="no2Status=${latest.no2 <= 40 ? 'Чисто' : (latest.no2 <= 80 ? 'Помірно' : 'Забруднено')}">
-                <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getNo2Color()} + ' 0%, #1e293b 150%);'">
-                    <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalNO2">?</button>
-                    <small class="text-uppercase fw-bold opacity-75">Азот NO₂</small>
-                    <div class="card-value">
-                        <span th:text="${latest.no2 != null ? latest.no2 : '0.0'}">0.0</span>
-                        <small style="font-size: 1rem;"> мкг</small>
-                    </div>
-                    <div class="status-badge" th:text="${no2Status}">Статус</div>
+            <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getNo2Color()} + ' 0%, #1e293b 150%);'">
+                <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalNO2">?</button>
+                <small class="text-uppercase fw-bold opacity-75">Азот NO₂</small>
+                <div class="card-value">
+                    <span th:text="${#numbers.formatDecimal(latest.no2, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>
+                    <small style="font-size: 1rem;"> мкг</small>
                 </div>
+                <div class="status-badge" th:text="${latest.no2 <= 40 ? 'Чисто' : 'Забруднено'}">Статус</div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card-wrapper" th:with="tempStatus=${latest.temperature > 25 ? 'Спекотно' : (latest.temperature > 15 ? 'Комфортно' : 'Прохолодно')}">
-                <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getTempColor()} + ' 0%, #1e293b 150%);'">
-                    <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalTemp">?</button>
-                    <small class="text-uppercase fw-bold opacity-75">Температура</small>
-                    <div class="card-value"><span th:text="${latest.temperature != null ? latest.temperature : '0.0'}">0.0</span>°C</div>
-                    <div class="status-badge" th:text="${tempStatus}">Статус</div>
-                </div>
+            <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getTempColor()} + ' 0%, #1e293b 150%);'">
+                <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalTemp">?</button>
+                <small class="text-uppercase fw-bold opacity-75">Температура</small>
+                <div class="card-value"><span th:text="${#numbers.formatDecimal(latest.temperature, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>°C</div>
+                <div class="status-badge" th:text="${latest.temperature > 25 ? 'Спекотно' : (latest.temperature > 15 ? 'Комфортно' : 'Прохолодно')}">Статус</div>
             </div>
         </div>
 
@@ -106,17 +104,20 @@
             <div class="indicator-card" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
                 <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalHum">?</button>
                 <small class="text-uppercase fw-bold opacity-75">Вологість</small>
-                <div class="card-value"><span th:text="${latest.humidity != null ? latest.humidity : '0.0'}">0.0</span>%</div>
+                <div class="card-value"><span th:text="${#numbers.formatDecimal(latest.humidity, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>%</div>
                 <div class="status-badge" th:text="${latest.humidity > 60 ? 'Волого' : (latest.humidity < 30 ? 'Сухо' : 'Оптимально')}">Статус</div>
             </div>
         </div>
     </div>
 
-    <div class="overall-status-box d-flex align-items-center" th:style="'border-left-color:' + ${latest.getPm25Color()}">
+    <div class="overall-status-box d-flex align-items-center" th:style="'border-left-color:' + ${latest.getAqiColor()}">
         <div class="me-4" style="font-size: 2.5rem;">🍃</div>
         <div>
             <h5 class="fw-bold mb-1">Загальний стан повітря: <span th:text="${latest.getOverallStatus()}">Аналіз...</span></h5>
-            <p class="text-muted small mb-0">Комплексна оцінка екологічної ситуації в місті на основі останніх отриманих даних.</p>
+            <p class="text-muted small mb-0">
+                На основі аналізу всіх показників, сьогодні в Ужгороді
+                <span th:text="${latest.getOverallStatus() == 'Відмінно' ? 'ідеальні умови для прогулянок.' : 'рекомендується звернути увагу на якість повітря.'}">порада</span>
+            </p>
         </div>
     </div>
 
@@ -124,16 +125,37 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <h3 class="h6 fw-bold text-uppercase text-muted mb-0">📈 Динаміка показника: <span id="activeParamName">PM2.5</span></h3>
             <ul class="nav nav-pills small" id="chartPills">
-                <li class="nav-item"><a class="nav-link active" onclick="switchChart('pm25', 'PM2.5')">PM2.5</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchChart('pm10', 'PM10')">PM10</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchChart('no2', 'NO₂')">NO₂</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchChart('temp', 'Температура')">Темп.</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchChart('hum', 'Вологість')">Вологість</a></li>
+                <li class="nav-item"><a class="nav-link active" onclick="changeChart('pm25', 'PM2.5')">PM2.5</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="changeChart('pm10', 'PM10')">PM10</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="changeChart('no2', 'NO₂')">NO₂</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="changeChart('temp', 'Температура')">Темп.</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="changeChart('hum', 'Вологість')">Вологість</a></li>
             </ul>
         </div>
-
         <div class="text-center p-3 border rounded-4 bg-light">
-            <img id="chartImage" th:src="@{/chart/pm25}" class="img-fluid" alt="Графік екологічної динаміки">
+            <img id="chartImage" th:src="@{/chart/pm25}" class="img-fluid" alt="Графік">
+        </div>
+    </div>
+
+    <div class="row mt-5 mb-5">
+        <div class="col-12 text-center">
+            <h3 class="h6 fw-bold mb-4 text-uppercase text-muted">🕒 Хронологія вимірювань (останні 20)</h3>
+            <div class="history-container">
+                <div th:each="m : ${history}" class="history-item shadow-sm">
+                    <div class="time-col" th:text="${#temporals.format(m.timestamp, 'HH:mm')}"></div>
+                    <div class="value-col"><span th:text="${#numbers.formatDecimal(m.pm25, 1, 'DEFAULT', 2, 'DEFAULT')}"></span><small> мкг</small></div>
+                    <div class="value-col"><span th:text="${#numbers.formatDecimal(m.pm10, 1, 'DEFAULT', 2, 'DEFAULT')}"></span><small> мкг</small></div>
+                    <div class="value-col"><span th:text="${#numbers.formatDecimal(m.no2, 1, 'DEFAULT', 2, 'DEFAULT')}"></span><small> мкг</small></div>
+                    <div class="value-col"><span th:text="${#numbers.formatDecimal(m.temperature, 1, 'DEFAULT', 2, 'DEFAULT')}"></span><small>°C</small></div>
+                    <div class="value-col"><span th:text="${#numbers.formatDecimal(m.humidity, 1, 'DEFAULT', 2, 'DEFAULT')}"></span><small>%</small></div>
+                    <div class="status-col">
+                        <span class="status-pill" th:style="'background:' + ${m.getAqiColor()}" th:text="${m.getOverallStatus()}"></span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="/history" class="btn btn-outline-secondary btn-sm border-0 fw-bold">ПЕРЕГЛЯНУТИ ВЕСЬ АРХІВ ↓</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -144,7 +166,8 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3">Дрібнодисперсний пил PM2.5</h4>
                 <p>Ці частинки настільки малі, що легко проникають у легені та серцево-судинну систему.</p>
-                <a href="https://uk.wikipedia.org/wiki/PM2.5" target="_blank" class="btn btn-outline-success w-100">Докладніше</a>
+                <div class="alert alert-success small"><strong>Порада:</strong> При низьких значеннях рекомендується часте провітрювання.</div>
+                <a href="https://uk.wikipedia.org/wiki/PM2.5" target="_blank" class="btn btn-outline-success w-100">Докладніше на Вікіпедія</a>
             </div>
         </div>
     </div>
@@ -156,7 +179,8 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-secondary">Тверді частинки PM10</h4>
                 <p>Це суміш часток пилу, попелу, сажі та диму. Вони можуть подразнювати дихальні шляхи.</p>
-                <a href="https://uk.wikipedia.org/wiki/Зважені_частинки" target="_blank" class="btn btn-outline-secondary w-100">Докладніше</a>
+                <div class="alert alert-info small"><strong>Порада:</strong> Використовуйте вологе прибирання та HEPA-фільтри.</div>
+                <a href="https://uk.wikipedia.org/wiki/Зважені_частинки" target="_blank" class="btn btn-outline-secondary w-100">Докладніше на Вікіпедія</a>
             </div>
         </div>
     </div>
@@ -168,7 +192,8 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-warning">Діоксид азоту (NO₂)</h4>
                 <p>Токсичний газ від вихлопних газів автомобілів та промисловості.</p>
-                <a href="https://uk.wikipedia.org/wiki/Діоксид_азоту" target="_blank" class="btn btn-outline-warning w-100">Докладніше</a>
+                <div class="alert alert-warning small"><strong>Порада:</strong> Уникайте прогулянок біля доріг у години пік.</div>
+                <a href="https://uk.wikipedia.org/wiki/Діоксид_азоту" target="_blank" class="btn btn-outline-warning w-100">Докладніше на Вікіпедія</a>
             </div>
         </div>
     </div>
@@ -180,7 +205,8 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-primary">Температура повітря</h4>
                 <p>Впливає на загальне самопочуття та стан навколишнього середовища.</p>
-                <a href="https://uk.wikipedia.org/wiki/Температура_повітря" target="_blank" class="btn btn-outline-primary w-100">Докладніше</a>
+                <div class="alert alert-primary small"><strong>Порада:</strong> Оптимальна температура для житла — 18-22°C.</div>
+                <a href="https://uk.wikipedia.org/wiki/Температура_повітря" target="_blank" class="btn btn-outline-primary w-100 mt-2">Докладніше на Вікіпедія</a>
             </div>
         </div>
     </div>
@@ -192,27 +218,20 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-info">Відносна вологість</h4>
                 <p>Впливає на дихання та стан шкіри. Оптимальний рівень — 40-60%.</p>
-                <a href="https://uk.wikipedia.org/wiki/Вологість_повітря" target="_blank" class="btn btn-outline-info w-100">Докладніше</a>
+                <div class="alert alert-info small"><strong>Порада:</strong> Використовуйте зволожувачі при сухому повітрі.</div>
+                <a href="https://uk.wikipedia.org/wiki/Вологість_повітря" target="_blank" class="btn btn-outline-info w-100 mt-2">Докладніше на Вікіпедія</a>
             </div>
         </div>
     </div>
 </div>
 
-<script th:inline="javascript">
-    function switchChart(paramType, paramLabel) {
-        // Оновлюємо текстовий заголовок
-        document.getElementById('activeParamName').innerText = paramLabel;
-
-        // Змінюємо шлях картинки на новий ендпоінт контролера
-        document.getElementById('chartImage').src = '/chart/' + paramType;
-
-        // Перемикаємо візуально активну вкладку (клас active)
-        const links = document.querySelectorAll('#chartPills .nav-link');
-        links.forEach(link => {
-            link.classList.remove('active');
-            if (link.innerText === paramLabel || (paramLabel === 'Температура' && link.innerText === 'Темп.')) {
-                link.classList.add('active');
-            }
+<script>
+    function changeChart(type, name) {
+        document.getElementById('activeParamName').innerText = name;
+        document.getElementById('chartImage').src = "/chart/" + type + "?v=" + Date.now();
+        document.querySelectorAll('#chartPills .nav-link').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText === name || (name === 'Температура' && btn.innerText === 'Темп.')) btn.classList.add('active');
         });
     }
 </script>

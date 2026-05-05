@@ -1,7 +1,6 @@
 package ua.edu.uzhnu.ecomonitor.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ua.edu.uzhnu.ecomonitor.model.Measurement;
@@ -31,10 +30,7 @@ public class WeatherApiService {
         this.restTemplate = new RestTemplate();
     }
 
-    @Scheduled(cron = "0 0 * * * *")
     public Measurement fetchAndSaveData() {
-        System.out.println("Scheduler execution started: Fetching fresh environmental metrics...");
-
         String airUrl = String.format(
                 "http://api.openweathermap.org/data/2.5/air_pollution?lat=%s&lon=%s&appid=%s",
                 lat, lon, apiKey
@@ -52,7 +48,7 @@ public class WeatherApiService {
             if (airResponse != null && weatherResponse != null) {
                 Measurement measurement = new Measurement();
 
-                // Оновлений парсинг екологічних маркерів
+                // Парсинг екології
                 List<Map<String, Object>> list = (List<Map<String, Object>>) airResponse.get("list");
                 Map<String, Object> components = (Map<String, Object>) list.get(0).get("components");
 
@@ -60,19 +56,18 @@ public class WeatherApiService {
                 measurement.setPm10(((Number) components.get("pm10")).doubleValue());
                 measurement.setNo2(((Number) components.get("no2")).doubleValue());
 
-                // Оновлений парсинг метеорологічних маркерів
+                // Парсинг погоди (температура та вологість)
                 Map<String, Object> main = (Map<String, Object>) weatherResponse.get("main");
                 measurement.setTemperature(((Number) main.get("temp")).doubleValue());
                 measurement.setHumidity(((Number) main.get("humidity")).doubleValue());
 
-                // ФІКС БАГУ: Тепер фіксуємо точний час транзакції в базі даних!
                 measurement.setTimestamp(LocalDateTime.now());
 
-                System.out.println("Scheduler transaction pipeline completed successfully. Timestamp applied.");
+                // Зберігаємо і ПОВЕРТАЄМО об'єкт
                 return repository.save(measurement);
             }
         } catch (Exception e) {
-            System.err.println("CRITICAL: Failed to process automated data collection task: " + e.getMessage());
+            System.err.println("Помилка API: " + e.getMessage());
         }
         return null;
     }

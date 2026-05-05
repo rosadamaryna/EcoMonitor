@@ -12,7 +12,6 @@ public class MainController {
 
     private final MeasurementService measurementService;
 
-    // Впровадження залежності через конструктор — гарний тон у Spring
     public MainController(MeasurementService measurementService) {
         this.measurementService = measurementService;
     }
@@ -28,7 +27,7 @@ public class MainController {
         return "index";
     }
 
-    // Сторінка історії (Архів) — додаємо для Коміту 17
+    // Сторінка історії
     @GetMapping("/history")
     public String history(Model model) {
         List<Measurement> allHistory = measurementService.getAllMeasurements();
