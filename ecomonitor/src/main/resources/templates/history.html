@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoMonitor - Повний архів</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #f4f7f6;
+            --card-radius: 20px;
+        }
+
+        body { background-color: var(--bg-main); font-family: 'Segoe UI', sans-serif; }
+
+        /* НАВІГАЦІЯ */
+        .navbar { background: white !important; border-bottom: 1px solid #dee2e6; }
+        .navbar-brand { font-weight: 800; color: #10b981 !important; }
+
+        /* СТИЛІ ІСТОРІЇ З ГОЛОВНОЇ */
+        .history-container { max-width: 1100px; margin: 0 auto; }
+
+        /* Заголовок колонок для зручності читання */
+        .history-header {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr 1.5fr;
+            padding: 10px 20px;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .history-item {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr 1.5fr;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+        }
+
+        .time-col { font-weight: 600; color: #475569; }
+        .value-col { font-weight: 700; color: #1e293b; }
+        .value-col small { font-weight: normal; color: #94a3b8; margin-left: 2px; }
+
+        .status-pill {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            min-width: 110px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .back-btn:hover { color: #10b981; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-light shadow-sm sticky-top mb-5">
+    <div class="container">
+        <a class="navbar-brand" href="/">🌿 EcoMonitor UzhNU</a>
+        <a href="/" class="back-btn small">← НА ГОЛОВНУ</a>
+    </div>
+</nav>
+
+<div class="container mb-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-2">📊 Повний архів вимірювань</h2>
+        <p class="text-muted">Історія екологічного стану за весь період спостереження</p>
+    </div>
+
+    <div class="history-container">
+        <!-- Шапка таблиці -->
+        <div class="history-header d-none d-md-grid">
+            <div>Дата та час</div>
+            <div>PM2.5</div>
+            <div>PM10</div>
+            <div>NO₂</div>
+            <div>Темп.</div>
+            <div>Волог.</div>
+            <div class="text-end">Статус повітря</div>
+        </div>
+
+        <!-- Рядки даних -->
+        <div th:each="m : ${fullHistory}" class="history-item">
+            <div class="time-col" th:text="${#temporals.format(m.timestamp, 'dd.MM HH:mm:ss')}">Дата</div>
+            <div class="value-col"><span th:text="${m.pm25}"></span><small>мкг</small></div>
+            <div class="value-col"><span th:text="${m.pm10}"></span><small>мкг</small></div>
+            <div class="value-col"><span th:text="${m.no2}"></span><small>мкг</small></div>
+            <div class="value-col"><span th:text="${m.temperature}"></span><small>°C</small></div>
+            <div class="value-col"><span th:text="${m.humidity}"></span><small>%</small></div>
+            <div class="status-col text-end">
+                <span class="status-pill"
+                      th:style="'background:' + ${m.getAqiColor()}"
+                      th:text="${m.getAqiStatus()}">Статус</span>
+            </div>
+        </div>
+
+        <!-- Якщо історія порожня -->
+        <div th:if="${#lists.isEmpty(fullHistory)}" class="text-center py-5">
+            <p class="text-muted italic">Архів поки що порожній...</p>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center py-5 opacity-50 small">
+    © 2026 Росада Марина — EcoMonitor History Archive
+</footer>
+
+</body>
+</html>
