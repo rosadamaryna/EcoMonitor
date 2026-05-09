@@ -107,19 +107,30 @@
 
         <!-- Рядки даних -->
         <div th:each="m : ${fullHistory}" class="history-item">
-            <div class="time-col" th:text="${#temporals.format(m.timestamp, 'dd.MM HH:mm:ss')}">Дата</div>
-            <div class="value-col"><span th:text="${m.pm25}"></span><small>мкг</small></div>
-            <div class="value-col"><span th:text="${m.pm10}"></span><small>мкг</small></div>
-            <div class="value-col"><span th:text="${m.no2}"></span><small>мкг</small></div>
-            <div class="value-col"><span th:text="${m.temperature}"></span><small>°C</small></div>
-            <div class="value-col"><span th:text="${m.humidity}"></span><small>%</small></div>
+            <div class="time-col" th:text="${#temporals.format(m.timestamp, 'dd.MM.yyyy HH:mm:ss')}">Дата</div>
+
+            <div class="value-col">
+                <span th:text="${m.pm25 != null ? #numbers.formatDecimal(m.pm25, 1, 'DEFAULT', 2, 'DEFAULT') : '0.00'}"></span><small>мкг</small>
+            </div>
+            <div class="value-col">
+                <span th:text="${m.pm10 != null ? #numbers.formatDecimal(m.pm10, 1, 'DEFAULT', 2, 'DEFAULT') : '0.00'}"></span><small>мкг</small>
+            </div>
+            <div class="value-col">
+                <span th:text="${m.no2 != null ? #numbers.formatDecimal(m.no2, 1, 'DEFAULT', 2, 'DEFAULT') : '0.00'}"></span><small>мкг</small>
+            </div>
+            <div class="value-col">
+                <span th:text="${m.temperature != null ? #numbers.formatDecimal(m.temperature, 1, 'DEFAULT', 2, 'DEFAULT') : '0.00'}"></span><small>°C</small>
+            </div>
+            <div class="value-col">
+                <span th:text="${m.humidity != null ? #numbers.formatDecimal(m.humidity, 1, 'DEFAULT', 2, 'DEFAULT') : '0.00'}"></span><small>%</small>
+            </div>
+
             <div class="status-col text-end">
                 <span class="status-pill"
-                      th:style="'background:' + ${m.getAqiColor()}"
-                      th:text="${m.getAqiStatus()}">Статус</span>
+                      th:style="'background-color: ' + ${m.getOverallStatusColor()}"
+                      th:text="${m.getOverallStatus()}">Статус</span>
             </div>
         </div>
-
         <!-- Якщо історія порожня -->
         <div th:if="${#lists.isEmpty(fullHistory)}" class="text-center py-5">
             <p class="text-muted italic">Архів поки що порожній...</p>

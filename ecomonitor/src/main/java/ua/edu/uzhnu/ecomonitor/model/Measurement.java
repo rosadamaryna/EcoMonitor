@@ -38,6 +38,7 @@ public class Measurement {
 
     // --- Методи для обробки та класифікації екологічних показників ---
 
+    // Метод статусу для PM2.5
     public String getAqiStatus() {
         if (pm25 == null) return "Немає даних";
         if (pm25 <= 12.0) return "Відмінно";
@@ -46,41 +47,74 @@ public class Measurement {
         return "Небезпечно";
     }
 
+    // Головний інтегральний статус системи
     public String getOverallStatus() {
-        // Перевірка на null, щоб уникнути помилки 500
-        if (pm25 == null || pm10 == null || no2 == null) return "Оновлення...";
+        if (pm25 == null || pm10 == null || no2 == null) return "Синхронізація...";
 
-        // Логіка "найгіршого показника"
-        if (pm25 > 55.4 || pm10 > 150 || no2 > 100) return "Небезпечно";
-        if (pm25 > 35.4 || pm10 > 100 || no2 > 80) return "Шкідливо";
-        if (pm25 > 12.0 || pm10 > 50 || no2 > 40) return "Задовільно";
+        // Перевірка на "Небезпечно"
+        if (pm25 > 55.4) return "Небезпечно";
 
+        // Перевірка на "Шкідливо"
+        if (pm25 > 35.4 || pm10 > 100.0 || no2 > 80.0) return "Шкідливо";
+
+        // Перевірка на "Задовільно"
+        if (pm25 > 12.0 || pm10 > 50.0 || no2 > 40.0) return "Задовільно";
+
+        // Якщо всі показники в нормі
         return "Відмінно";
     }
 
     // --- Методи динамічного підбору кольорів для веб-інтерфейсу (HEX-коди) ---
 
+    // Колір для PM2.5
     public String getAqiColor() {
-        if (pm25 == null) return "#808080";
-        if (pm25 <= 12.0) return "#00e400";
-        if (pm25 <= 35.4) return "#ffff00";
-        if (pm25 <= 55.4) return "#ff7e00";
-        return "#ff0000";
+        if (pm25 == null) return "#475569"; // Сірий
+        if (pm25 <= 12.0) return "#10b981"; // Зелений
+        if (pm25 <= 35.4) return "#f59e0b"; // Жовтий
+        if (pm25 <= 55.4) return "#ef4444"; // Червоний
+        return "#7f1d1d"; // Бордовий
     }
 
+    // Колір для PM10
     public String getPm10Color() {
-        if (pm10 == null) return "#64748b";
-        return (pm10 <= 50) ? "#10b981" : (pm10 <= 100) ? "#f59e0b" : "#ef4444";
+        if (pm10 == null) return "#475569";
+        if (pm10 <= 50.0) return "#10b981";  // Зелений
+        if (pm10 <= 100.0) return "#f59e0b"; // Жовтий
+        return "#ef4444";                    // Червоний
     }
 
+    // Колір для NO2
     public String getNo2Color() {
-        if (no2 == null) return "#64748b";
-        return (no2 <= 40) ? "#10b981" : (no2 <= 80) ? "#f59e0b" : "#ef4444";
+        if (no2 == null) return "#475569";
+        if (no2 <= 40.0) return "#10b981";  // Зелений
+        if (no2 <= 80.0) return "#f59e0b";  // Жовтий
+        return "#ef4444";                   // Червоний
     }
 
+    // Колір для температури
     public String getTempColor() {
-        if (temperature == null) return "#64748b";
-        if (temperature > 30 || temperature < 0) return "#ef4444";
-        return (temperature >= 15 && temperature <= 25) ? "#10b981" : "#3b82f6";
+        if (temperature == null) return "#475569";
+        if (temperature >= 15.0 && temperature <= 25.0) return "#10b981"; // Зелений
+        if ((temperature >= 0.0 && temperature < 15.0) || (temperature > 25.0 && temperature <= 30.0)) return "#3b82f6"; // Синій
+        return "#ef4444"; // Червоний
+    }
+
+    //Колір для вологості
+    public String getHumidityColor() {
+        if (humidity == null) return "#475569";
+        if (humidity >= 40.0 && humidity <= 60.0) return "#10b981"; // Зелений
+        if ((humidity >= 20.0 && humidity < 40.0) || (humidity > 60.0 && humidity <= 80.0)) return "#3b82f6"; // Синій
+        return "#ef4444"; // Червоний
+    }
+
+    public String getOverallStatusColor() {
+        String status = getOverallStatus();
+        switch (status) {
+            case "Відмінно": return "#10b981"; // Зелений
+            case "Задовільно": return "#f59e0b"; // Жовтий
+            case "Шкідливо": return "#ef4444"; // Червоний
+            case "Небезпечно": return "#7f1d1d"; // Бордовий
+            default: return "#475569";
+        }
     }
 }

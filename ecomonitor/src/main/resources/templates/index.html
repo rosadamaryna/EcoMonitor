@@ -75,7 +75,7 @@
                     <span th:text="${#numbers.formatDecimal(latest.pm10, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>
                     <small style="font-size: 1rem;"> мкг</small>
                 </div>
-                <div class="status-badge" th:text="${latest.pm10 <= 50 ? 'Норма' : 'Підвищено'}">Статус</div>
+                <div class="status-badge" th:text="${latest.pm10 <= 50.0 ? 'Відмінно' : (latest.pm10 <= 100.0 ? 'Задовільно' : 'Шкідливо')}">Статус</div>
             </div>
         </div>
 
@@ -87,7 +87,7 @@
                     <span th:text="${#numbers.formatDecimal(latest.no2, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>
                     <small style="font-size: 1rem;"> мкг</small>
                 </div>
-                <div class="status-badge" th:text="${latest.no2 <= 40 ? 'Чисто' : 'Забруднено'}">Статус</div>
+                <div class="status-badge" th:text="${latest.no2 <= 40.0 ? 'Відмінно' : (latest.no2 <= 80.0 ? 'Задовільно' : 'Шкідливо')}">Статус</div>
             </div>
         </div>
 
@@ -96,27 +96,42 @@
                 <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalTemp">?</button>
                 <small class="text-uppercase fw-bold opacity-75">Температура</small>
                 <div class="card-value"><span th:text="${#numbers.formatDecimal(latest.temperature, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>°C</div>
-                <div class="status-badge" th:text="${latest.temperature > 25 ? 'Спекотно' : (latest.temperature > 15 ? 'Комфортно' : 'Прохолодно')}">Статус</div>
+                <div class="status-badge" th:text="${latest.temperature >= 15.0 && latest.temperature <= 25.0 ? 'Комфортно' : ((latest.temperature >= 0.0 && latest.temperature < 15.0) || (latest.temperature > 25.0 && latest.temperature <= 30.0) ? 'Помірно' : 'Екстремально')}">Статус</div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="indicator-card" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
+            <div class="indicator-card" th:style="'background: linear-gradient(135deg, ' + ${latest.getHumidityColor()} + ' 0%, #1e293b 150%);'">
                 <button class="info-btn" data-bs-toggle="modal" data-bs-target="#modalHum">?</button>
                 <small class="text-uppercase fw-bold opacity-75">Вологість</small>
                 <div class="card-value"><span th:text="${#numbers.formatDecimal(latest.humidity, 1, 'DEFAULT', 2, 'DEFAULT')}">0.00</span>%</div>
-                <div class="status-badge" th:text="${latest.humidity > 60 ? 'Волого' : (latest.humidity < 30 ? 'Сухо' : 'Оптимально')}">Статус</div>
+                <div class="status-badge" th:text="${latest.humidity >= 40.0 && latest.humidity <= 60.0 ? 'Комфортно' : ((latest.humidity >= 20.0 && latest.humidity < 40.0) || (latest.humidity > 60.0 && latest.humidity <= 80.0) ? 'Помірно' : 'Екстремально')}">Статус</div>
             </div>
         </div>
     </div>
 
-    <div class="overall-status-box d-flex align-items-center" th:style="'border-left-color:' + ${latest.getAqiColor()}">
-        <div class="me-4" style="font-size: 2.5rem;">🍃</div>
+    <div class="overall-status-box d-flex align-items-center"
+         th:style="'border-left: 5px solid ' + ${latest.getOverallStatusColor()} + ';'">
+
+        <div class="me-4" style="font-size: 2.5rem;"
+             th:text="${latest.getOverallStatus() == 'Відмінно' ? '🍃' : (latest.getOverallStatus() == 'Задовільно' ? '🌤️' : (latest.getOverallStatus() == 'Шкідливо' ? '⚠️' : '😷'))}">
+            🍃
+        </div>
+
         <div>
-            <h5 class="fw-bold mb-1">Загальний стан повітря: <span th:text="${latest.getOverallStatus()}">Аналіз...</span></h5>
+            <h5 class="fw-bold mb-1">
+                Загальний стан повітря:
+                <span th:style="'color: ' + ${latest.getOverallStatusColor()}" th:text="${latest.getOverallStatus()}">Аналіз...</span>
+            </h5>
+
             <p class="text-muted small mb-0">
-                На основі аналізу всіх показників, сьогодні в Ужгороді
-                <span th:text="${latest.getOverallStatus() == 'Відмінно' ? 'ідеальні умови для прогулянок.' : 'рекомендується звернути увагу на якість повітря.'}">порада</span>
+                На основі аналізу всіх показників, зараз в Ужгороді
+                <span th:text="${latest.getOverallStatus() == 'Відмінно' ? 'ідеальні умови для прогулянок, занять спортом та провітрювання приміщень.' :
+                             (latest.getOverallStatus() == 'Задовільно' ? 'прийнятна якість повітря, проте чутливим групам населення варто бути обачними.' :
+                             (latest.getOverallStatus() == 'Шкідливо' ? 'зафіксовано перевищення норм! Рекомендується обмежити тривале перебування на вулиці.' :
+                             'критичний уровень забруднення! Зачиніть вікна та утримайтеся від виходу на відкрите повітря.'))}">
+                порада
+            </span>
             </p>
         </div>
     </div>
