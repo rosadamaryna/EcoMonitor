@@ -16,7 +16,6 @@ public class MainController {
         this.measurementService = measurementService;
     }
 
-    // Головна сторінка
     @GetMapping("/")
     public String index(Model model) {
         List<Measurement> history = measurementService.getLatestMeasurements();
@@ -27,7 +26,6 @@ public class MainController {
         return "index";
     }
 
-    // Сторінка історії
     @GetMapping("/history")
     public String history(Model model) {
         List<Measurement> allHistory = measurementService.getAllMeasurements();

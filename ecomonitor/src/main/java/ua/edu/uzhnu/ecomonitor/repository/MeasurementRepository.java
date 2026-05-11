@@ -7,6 +7,10 @@ import java.util.List;
 
 @Repository
 public interface MeasurementRepository extends JpaRepository<Measurement, Long> {
+
+    // Вибірка 20 останніх записів для побудови графіків на головній сторінці
     List<Measurement> findTop20ByOrderByTimestampDesc();
+
+    // Вибірка всіх записів у зворотному порядку для сторінки історії
     List<Measurement> findAllByOrderByTimestampDesc();
 }

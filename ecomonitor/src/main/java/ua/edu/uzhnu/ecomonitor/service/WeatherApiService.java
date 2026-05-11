@@ -48,7 +48,6 @@ public class WeatherApiService {
             if (airResponse != null && weatherResponse != null) {
                 Measurement measurement = new Measurement();
 
-                // Парсинг екології
                 List<Map<String, Object>> list = (List<Map<String, Object>>) airResponse.get("list");
                 Map<String, Object> components = (Map<String, Object>) list.get(0).get("components");
 
@@ -56,14 +55,12 @@ public class WeatherApiService {
                 measurement.setPm10(((Number) components.get("pm10")).doubleValue());
                 measurement.setNo2(((Number) components.get("no2")).doubleValue());
 
-                // Парсинг погоди (температура та вологість)
                 Map<String, Object> main = (Map<String, Object>) weatherResponse.get("main");
                 measurement.setTemperature(((Number) main.get("temp")).doubleValue());
                 measurement.setHumidity(((Number) main.get("humidity")).doubleValue());
 
                 measurement.setTimestamp(LocalDateTime.now());
 
-                // Зберігаємо і ПОВЕРТАЄМО об'єкт
                 return repository.save(measurement);
             }
         } catch (Exception e) {
