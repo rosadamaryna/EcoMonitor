@@ -77,6 +77,38 @@
             transition: 0.3s;
         }
         .back-btn:hover { color: #10b981; }
+
+        /* Адаптивність для мобільних пристроїв (екрани менше 768px) */
+        @media (max-width: 767.98px) {
+            .history-item {
+                grid-template-columns: 1fr; /* Перебудовуємо в одну вертикальну колонку */
+                gap: 8px;
+                padding: 15px;
+            }
+
+            .time-col {
+                border-bottom: 1px solid #edf2f7;
+                padding-bottom: 5px;
+                margin-bottom: 5px;
+                font-size: 0.9rem;
+            }
+
+            /* Робимо вирівнювання статусу по лівому краю на мобільних */
+            .status-col.text-end {
+                text-align: left !important;
+                margin-top: 5px;
+            }
+
+            /* Додаємо псевдоелементи для підпису показників на мобільних (опціонально) */
+            .value-col::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #64748b;
+                display: inline-block;
+                width: 100px;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 <body>

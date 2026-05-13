@@ -182,7 +182,14 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3">Дрібнодисперсний пил PM2.5</h4>
                 <p>Ці частинки настільки малі, що легко проникають у легені та серцево-судинну систему.</p>
-                <div class="alert alert-success small"><strong>Порада:</strong> При низьких значеннях рекомендується часте провітрювання.</div>
+
+                <div th:if="${latest.pm25 <= 12.0}" class="alert alert-success small">
+                    Якість повітря чудова. Ідеальний час для прогулянок та провітрювання приміщень.
+                </div>
+                <div th:if="${latest.pm25 > 12.0}" class="alert alert-danger small">
+                    <strong>Застереження:</strong> Рівень пилу підвищений! Рекомендується обмежити тривале перебування на вулиці та зачинити вікна.
+                </div>
+
                 <a href="https://uk.wikipedia.org/wiki/PM2.5" target="_blank" class="btn btn-outline-success w-100">Докладніше на Вікіпедія</a>
             </div>
         </div>
@@ -195,7 +202,14 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-secondary">Тверді частинки PM10</h4>
                 <p>Це суміш часток пилу, попелу, сажі та диму. Вони можуть подразнювати дихальні шляхи.</p>
-                <div class="alert alert-info small"><strong>Порада:</strong> Використовуйте вологе прибирання та HEPA-фільтри.</div>
+
+                <div th:if="${latest.pm10 <= 50.0}" class="alert alert-success small">
+                    Концентрація в межах норми. Можна безпечно перебувати на відкритому повітрі.
+                </div>
+                <div th:if="${latest.pm10 > 50.0}" class="alert alert-warning small">
+                    <strong>Порада:</strong> Рівень частинок підвищений. Чутливим групам населення варто використовувати HEPA-фільтри вдома.
+                </div>
+
                 <a href="https://uk.wikipedia.org/wiki/Зважені_частинки" target="_blank" class="btn btn-outline-secondary w-100">Докладніше на Вікіпедія</a>
             </div>
         </div>
@@ -208,7 +222,14 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-warning">Діоксид азоту (NO₂)</h4>
                 <p>Токсичний газ від вихлопних газів автомобілів та промисловості.</p>
-                <div class="alert alert-warning small"><strong>Порада:</strong> Уникайте прогулянок біля доріг у години пік.</div>
+
+                <div th:if="${latest.no2 <= 40.0}" class="alert alert-success small">
+                    Вміст газу мінімальний. Повітря безпечне для дихання.
+                </div>
+                <div th:if="${latest.no2 > 40.0}" class="alert alert-danger small">
+                    <strong>Порада:</strong> Рівень NO₂ перевищує норму! Уникайте прогулянок біля автомобільних доріг у години пік.
+                </div>
+
                 <a href="https://uk.wikipedia.org/wiki/Діоксид_азоту" target="_blank" class="btn btn-outline-warning w-100">Докладніше на Вікіпедія</a>
             </div>
         </div>
@@ -221,7 +242,14 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-primary">Температура повітря</h4>
                 <p>Впливає на загальне самопочуття та стан навколишнього середовища.</p>
-                <div class="alert alert-primary small"><strong>Порада:</strong> Оптимальна температура для житла — 18-22°C.</div>
+
+                <div th:if="${latest.temperature >= 15.0 && latest.temperature <= 25.0}" class="alert alert-success small">
+                    Температура є оптимальною та максимально комфортною для організму.
+                </div>
+                <div th:if="${latest.temperature < 15.0 || latest.temperature > 25.0}" class="alert alert-primary small">
+                    <strong>Порада:</strong> Температурні умови вимагають підбору відповідного одягу перед виходом на вулицю.
+                </div>
+
                 <a href="https://uk.wikipedia.org/wiki/Температура_повітря" target="_blank" class="btn btn-outline-primary w-100 mt-2">Докладніше на Вікіпедія</a>
             </div>
         </div>
@@ -234,13 +262,19 @@
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-info">Відносна вологість</h4>
                 <p>Впливає на дихання та стан шкіри. Оптимальний рівень — 40-60%.</p>
-                <div class="alert alert-info small"><strong>Порада:</strong> Використовуйте зволожувачі при сухому повітрі.</div>
+
+                <div th:if="${latest.humidity >= 40.0 && latest.humidity <= 60.0}" class="alert alert-success small">
+                    Вологість повітря ідеальна для дихальних шляхів та слизових оболонок.
+                </div>
+                <div th:if="${latest.humidity < 40.0 || latest.humidity > 60.0}" class="alert alert-info small">
+                    <strong>Порада:</strong> Вологість відхиляється від норми. Рекомендується використовувати кліматичні прилади.
+                </div>
+
                 <a href="https://uk.wikipedia.org/wiki/Вологість_повітря" target="_blank" class="btn btn-outline-info w-100 mt-2">Докладніше на Вікіпедія</a>
             </div>
         </div>
     </div>
 </div>
-
 <script>
     function changeChart(type, name) {
         document.getElementById('activeParamName').innerText = name;
