@@ -23,16 +23,21 @@ import java.util.List;
 @Service
 public class ChartService {
 
-    private final MeasurementRepository repository;
+    private final MeasurementRepository measurementRepository;
 
-    public ChartService(MeasurementRepository repository) {
-        this.repository = repository;
+    // Назва репозиторію тепер узгоджена
+    public ChartService(MeasurementRepository measurementRepository) {
+        this.measurementRepository = measurementRepository;
     }
 
-    public byte[] createChartBytes(String type) throws IOException {
-        // 1. Отримуємо останні 20 записів для більшої деталізації
-        List<Measurement> measurements = repository.findTop20ByOrderByTimestampDesc();
-        if (measurements.isEmpty()) return null;
+    public byte[] createChartBytes(String type, String locationName) throws IOException {
+        // 1. Отримуємо останні 20 записів для конкретної локації
+        List<Measurement> measurements = measurementRepository.findTop20ByLocationNameOrderByTimestampDesc(locationName);
+
+        // Перевірка на порожнечу тепер використовує правильну назву списку
+        if (measurements == null || measurements.isEmpty()) {
+            return null;
+        }
 
         // 2. РЕВЕРС: щоб графік малювався зліва направо (від старих до нових)
         Collections.reverse(measurements);
@@ -53,7 +58,7 @@ public class ChartService {
         String unit = getUnit(label);
 
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Динаміка: " + label,
+                "Динаміка: " + label + " (" + locationName + ")",
                 "Час",
                 unit,
                 dataset,
@@ -75,7 +80,7 @@ public class ChartService {
         // Фокусуємося на реальних значеннях (вісь не починається з 0, якщо значення близькі до 1.8)
         rangeAxis.setAutoRangeIncludesZero(false);
 
-        // Мінімальний крок для шкали змінено на менший, щоб бачити мікро-зміни (наприклад, 1.81 -> 1.82)
+        // Мінімальний крок для шкали змінено на менший, щоб бачити мікро-зміни
         rangeAxis.setAutoRangeMinimumSize(0.01);
 
         // Дозволяємо шкалі підлаштовуватися автоматично під нові дані

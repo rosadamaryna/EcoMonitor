@@ -8,6 +8,9 @@ import java.util.List;
 @Repository
 public interface MeasurementRepository extends JpaRepository<Measurement, Long> {
 
+    //Вибірка 20 останніх записів ДЛЯ КОНКРЕТНОЇ ЛОКАЦІЇ
+    List<Measurement> findTop20ByLocationNameOrderByTimestampDesc(String locationName);
+
     // Вибірка 20 останніх записів для побудови графіків на головній сторінці
     List<Measurement> findTop20ByOrderByTimestampDesc();
 

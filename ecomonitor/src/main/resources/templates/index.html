@@ -48,8 +48,13 @@
 <body>
 
 <nav class="navbar navbar-light bg-white shadow-sm mb-4">
-    <div class="container">
+    <div class="container d-flex justify-content-between align-items-center">
         <a class="navbar-brand fw-bold text-success" href="/">🌿 EcoMonitor UzhNU</a>
+
+        <span th:if="${latest != null}" class="badge bg-success px-3 py-2 fs-6">
+            Станція: <span id="stationHolder" th:data-name="${latest.locationName != null ? latest.locationName : 'Центр'}" th:text="${latest.locationName != null ? latest.locationName : 'Центр'}">Центр</span>
+        </span>
+
         <span class="small text-muted">Дані: OpenWeather API</span>
     </div>
 </nav>
@@ -130,18 +135,19 @@
 
             <p class="text-muted small mb-0">
                 <span th:text="${latest.getOverallStatus() == 'Дані синхронізуються...' ? 'Очікування підключення до бази даних та отримання актуальних екологічних показників...' :
-                             (latest.getOverallStatus() == 'Відмінно' ? 'На основі аналізу всіх показників, зараз в Ужгороді ідеальні умови для прогулянок, занять спортом та провітрювання приміщень.' :
-                             (latest.getOverallStatus() == 'Задовільно' ? 'На основі аналізу всіх показників, зараз в Ужгороді прийнятна якість повітря, проте чутливим групам населення варто бути обачними.' :
-                             (latest.getOverallStatus() == 'Шкідливо' ? 'На основі аналізу всіх показників, зараз в Ужгороді зафіксовано перевищення норм! Рекомендується обмежити тривале перебування на вулиці.' :
-                             'На основі аналізу всіх показників, зараз в Ужгороді критичний рівень забруднення! Зачиніть вікна та утримайтеся від виходу на відкрите повітря.')))}">
+                             (latest.getOverallStatus() == 'Відмінно' ? 'На основі аналізу всіх показників, зараз тут ідеальні умови для прогулянок, занять спортом та провітрювання приміщень.' :
+                             (latest.getOverallStatus() == 'Задовільно' ? 'На основі аналізу всіх показників, зараз тут прийнятна якість повітря, проте чутливим групам населення варто быть обачними.' :
+                             (latest.getOverallStatus() == 'Шкідливо' ? 'На основі аналізу всіх показників, зараз тут зафіксовано перевищення норм! Рекомендується обмежити тривале перебування на вулиці.' :
+                             'На основі аналізу всіх показників, зараз тут критичний рівень забруднення! Зачиніть вікна та утримайтеся від виходу на відкрите повітря.')))}">
                     порада
                 </span>
             </p>
         </div>
     </div>
+
     <div class="chart-card shadow-sm mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <h3 class="h6 fw-bold text-uppercase text-muted mb-0">📈 Динаміка показника: <span id="activeParamName">PM2.5</span></h3>
+            <h3 class="h6 fw-bold text-uppercase text-muted mb-0">📈  Динаміка показника: <span id="activeParamName">PM2.5</span></h3>
             <ul class="nav nav-pills small" id="chartPills">
                 <li class="nav-item"><a class="nav-link active" onclick="changeChart('pm25', 'PM2.5')">PM2.5</a></li>
                 <li class="nav-item"><a class="nav-link" onclick="changeChart('pm10', 'PM10')">PM10</a></li>
@@ -151,13 +157,13 @@
             </ul>
         </div>
         <div class="text-center p-3 border rounded-4 bg-light">
-            <img id="chartImage" th:src="@{/chart/pm25}" class="img-fluid" alt="Графік">
+            <img id="chartImage" th:src="@{/chart/pm25(loc=${latest.locationName != null ? latest.locationName : 'Центр'})}" class="img-fluid" alt="Графік">
         </div>
     </div>
 
     <div class="row mt-5 mb-5">
         <div class="col-12 text-center">
-            <h3 class="h6 fw-bold mb-4 text-uppercase text-muted">🕒 Хронологія вимірювань (останні 20)</h3>
+            <h3 class="h6 fw-bold mb-4 text-uppercase text-muted">🕒  Хронологія вимірювань (останні 20)</h3>
             <div class="history-container">
                 <div th:each="m : ${history}" class="history-item shadow-sm">
                     <div class="time-col" th:text="${#temporals.format(m.timestamp, 'HH:mm')}"></div>
@@ -183,7 +189,7 @@
         <div class="modal-content border-0 rounded-4 shadow">
             <div class="modal-body p-4 text-center">
                 <h4 class="fw-bold mb-3">Дрібнодисперсний пил PM2.5</h4>
-                <p>Ці частинки настільки малі, що легко проникають у легені та серцево-судинну систему.</p>
+                <p>Ці частинки настільше малі, що легко проникають у легені та серцево-судинну систему.</p>
 
                 <div th:if="${latest.pm25 <= 12.0}" class="alert alert-success small">
                     Якість повітря чудова. Ідеальний час для прогулянок та провітрювання приміщень.
@@ -277,14 +283,34 @@
         </div>
     </div>
 </div>
+
 <script>
     function changeChart(type, name) {
         document.getElementById('activeParamName').innerText = name;
-        document.getElementById('chartImage').src = "/chart/" + type + "?v=" + Date.now();
+
+        // Зчитуємо локацію напряму з HTML-елемента, куди її поклав Thymeleaf
+        const holder = document.getElementById('stationHolder');
+        const locName = holder ? holder.getAttribute('data-name') : 'Центр';
+
+        document.getElementById('chartImage').src = "/chart/" + type + "?loc=" + encodeURIComponent(locName) + "&v=" + Date.now();
+
         document.querySelectorAll('#chartPills .nav-link').forEach(btn => {
             btn.classList.remove('active');
             if(btn.innerText === name || (name === 'Температура' && btn.innerText === 'Темп.')) btn.classList.add('active');
         });
+    }
+</script>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('lat') || !urlParams.has('lng')) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                window.location.href = "/?lat=" + position.coords.latitude + "&lng=" + position.coords.longitude;
+            }, function(error) {
+                console.log("Геопозицію відхилено, використовується станція за замовчуванням.");
+            });
+        }
     }
 </script>
 

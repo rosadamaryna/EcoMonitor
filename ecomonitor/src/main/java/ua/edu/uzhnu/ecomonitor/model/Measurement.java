@@ -16,8 +16,22 @@ public class Measurement {
     private Double humidity;
     private LocalDateTime timestamp;
 
+    // --- НОВІ ПОЛЯ ДЛЯ ГЕОЛОКАЦІЇ ---
+    private String locationName;
+    private Double latitude;
+    private Double longitude;
+
     public Measurement() {}
 
+    // --- НОВІ ГЕТТЕРИ ТА СЕТТЕРИ ДЛЯ ГЕОЛОКАЦІЇ ---
+    public String getLocationName() { return locationName; }
+    public void setLocationName(String locationName) { this.locationName = locationName; }
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    // --- ТВОЇ ОРИГІНАЛЬНІ ГЕТТЕРИ ТА СЕТТЕРИ ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Double getPm25() { return pm25; }
