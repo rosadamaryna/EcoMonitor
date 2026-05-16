@@ -6,11 +6,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "measurements")
 public class Measurement {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Double pm25;
     private Double pm10;
     private Double no2;
@@ -20,7 +18,6 @@ public class Measurement {
 
     public Measurement() {}
 
-    // Геттери та сеттери
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Double getPm25() { return pm25; }
@@ -36,39 +33,59 @@ public class Measurement {
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 
-    // --- Методи для обробки та класифікації екологічних показників ---
-
-    // Метод статусу для PM2.5
+    // Текстовий статус для PM2.5
     public String getAqiStatus() {
-        if (pm25 == null) return "Немає даних";
+        if (pm25 == null) return "Дані синхронізуються...";
         if (pm25 <= 12.0) return "Відмінно";
         if (pm25 <= 35.4) return "Задовільно";
         if (pm25 <= 55.4) return "Шкідливо";
         return "Небезпечно";
     }
 
-    // Головний інтегральний статус системи
+    // Текстовий статус для PM10
+    public String getPm10Status() {
+        if (pm10 == null) return "Дані синхронізуються...";
+        if (pm10 <= 50.0) return "Відмінно";
+        if (pm10 <= 100.0) return "Задовільно";
+        return "Шкідливо";
+    }
+
+    // Текстовий статус для NO2
+    public String getNo2Status() {
+        if (no2 == null) return "Дані синхронізуються...";
+        if (no2 <= 40.0) return "Відмінно";
+        if (no2 <= 80.0) return "Задовільно";
+        return "Шкідливо";
+    }
+
+    // Текстовий статус для температури
+    public String getTempStatus() {
+        if (temperature == null) return "Дані синхронізуються...";
+        if (temperature >= 15.0 && temperature <= 25.0) return "Комфортно";
+        if ((temperature >= 0.0 && temperature < 15.0) || (temperature > 25.0 && temperature <= 30.0)) return "Помірно";
+        return "Екстремально";
+    }
+
+    // Текстовий статус для вологості
+    public String getHumidityStatus() {
+        if (humidity == null) return "Дані синхронізуються...";
+        if (humidity >= 40.0 && humidity <= 60.0) return "Комфортно";
+        if ((humidity >= 20.0 && humidity < 40.0) || (humidity > 60.0 && humidity <= 80.0)) return "Помірно";
+        return "Екстремально";
+    }
+
+    // Загальний інтегральний статус системи
     public String getOverallStatus() {
-        if (pm25 == null || pm10 == null || no2 == null) return "Синхронізація...";
-
-        // Перевірка на "Небезпечно"
+        if (pm25 == null || pm10 == null || no2 == null) return "Дані синхронізуються...";
         if (pm25 > 55.4) return "Небезпечно";
-
-        // Перевірка на "Шкідливо"
         if (pm25 > 35.4 || pm10 > 100.0 || no2 > 80.0) return "Шкідливо";
-
-        // Перевірка на "Задовільно"
         if (pm25 > 12.0 || pm10 > 50.0 || no2 > 40.0) return "Задовільно";
-
-        // Якщо всі показники в нормі
         return "Відмінно";
     }
 
-    // --- Методи динамічного підбору кольорів для веб-інтерфейсу (HEX-коди) ---
-
     // Колір для PM2.5
     public String getAqiColor() {
-        if (pm25 == null) return "#475569"; // Сірий
+        if (pm25 == null) return "#475569"; // Нейтральний сірий
         if (pm25 <= 12.0) return "#10b981"; // Зелений
         if (pm25 <= 35.4) return "#f59e0b"; // Жовтий
         if (pm25 <= 55.4) return "#ef4444"; // Червоний
@@ -99,7 +116,7 @@ public class Measurement {
         return "#ef4444"; // Червоний
     }
 
-    //Колір для вологості
+    // Колір для вологості
     public String getHumidityColor() {
         if (humidity == null) return "#475569";
         if (humidity >= 40.0 && humidity <= 60.0) return "#10b981"; // Зелений
@@ -107,7 +124,9 @@ public class Measurement {
         return "#ef4444"; // Червоний
     }
 
+    // Загальний колір системи
     public String getOverallStatusColor() {
+        if (pm25 == null || pm10 == null || no2 == null) return "#475569";
         String status = getOverallStatus();
         switch (status) {
             case "Відмінно": return "#10b981"; // Зелений
